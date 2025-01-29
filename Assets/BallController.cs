@@ -4,10 +4,12 @@ public class BallController : MonoBehaviour
 {
     [SerializeField] private Rigidbody sphereRigidbody;
     [SerializeField] private float ballSpeed = 2f;
+    [SerializeField] private float jumpForce = 5f;
+    [SerializeField] private bool midJump;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Debug.Log("Calling the Start method.");
+
     }
 
     // Update is called once per frame
@@ -29,10 +31,19 @@ public class BallController : MonoBehaviour
         if(Input.GetKey(KeyCode.A)){
         inputVector += Vector2.left;
        }
-       Debug.Log("Resulting Vector: " + inputVector);
+       //if the ball is in mid air, it cannot jump.
+        if(Input.GetKey(KeyCode.Space) && !midJump){
+            sphereRigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            midJump = true;
+        }
        Vector3 inputXZPlane = new Vector3(inputVector.x,0,inputVector.y);
        sphereRigidbody.AddForce(inputXZPlane * ballSpeed);
-       Debug.Log("Resulting 3D Vector: " + inputXZPlane);
        
+    }
+    //once the ball touches the floor, it may jump again.
+    void OnCollisionEnter(Collision collision){
+        if(collision.gameObject.CompareTag("floor")){
+            midJump = false;
+        }
     }
 }
